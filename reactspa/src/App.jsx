@@ -1,6 +1,4 @@
-import { Client as Styletron } from 'styletron-engine-atomic';
-import { Provider as StyletronProvider } from 'styletron-react';
-import { LightTheme, BaseProvider, styled } from 'baseui';
+
 import { StatefulInput } from 'baseui/input';
 import {
     HeaderNavigation,
@@ -24,48 +22,43 @@ const options = {
     maxDropdownHeight: '300px',
 };
 
-const engine = new Styletron();
-
 function App() {
 
     return (
         <div className="App">
-            <StyletronProvider value={engine}>
-                <BaseProvider theme={LightTheme}>
 
-                    <HeaderNavigation overrides={{
-                        Root: {
-                            style: {
-                                margin: "0 20px 0 20px"
-                            }
-                        }
-                    }} >
-                        <NavigationList $align={ALIGN.left}>
-                            <NavigationItem>historypaper</NavigationItem>
 
-                            {headerLinks.map((l, i) => (<NavigationItem key={i}>
-                                <SuperLink to={l.link}>{l.label}</SuperLink>
-                            </NavigationItem>))}
-                        </NavigationList>
-                        <NavigationList $align={ALIGN.center} />
-                        <NavigationList $align={ALIGN.right}>
-                        </NavigationList>
-                        <NavigationList $align={ALIGN.right}>
-                            <NavigationItem style={{ width: '200px' }}>
-                                <Search
-                                    {...options}
-                                    type={TYPE.search}
+            <HeaderNavigation overrides={{
+                Root: {
+                    style: {
+                        margin: "0 20px 0 20px"
+                    }
+                }
+            }} >
+                <NavigationList $align={ALIGN.left}>
+                    <NavigationItem>historypaper</NavigationItem>
 
-                                    onChange={() => { }}
-                                />
-                            </NavigationItem>
-                        </NavigationList>
-                    </HeaderNavigation>
-                    <Centered>
-                        <Outlet />
-                    </Centered>
-                </BaseProvider>
-            </StyletronProvider>
+                    {headerLinks.map((l, i) => (<NavigationItem key={i}>
+                        <SuperLink to={l.link}>{l.label}</SuperLink>
+                    </NavigationItem>))}
+                </NavigationList>
+                <NavigationList $align={ALIGN.center} />
+                <NavigationList $align={ALIGN.right}>
+                </NavigationList>
+                <NavigationList $align={ALIGN.right}>
+                    <NavigationItem style={{ width: '200px' }}>
+                        <Search
+                            {...options}
+                            type={TYPE.search}
+
+                            onChange={() => { }}
+                        />
+                    </NavigationItem>
+                </NavigationList>
+            </HeaderNavigation>
+            <Centered>
+                <Outlet />
+            </Centered>
         </div >
     );
 }

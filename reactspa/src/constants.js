@@ -7,6 +7,8 @@ const headerLinks = [
     },
 ]
 
-const archiveBaseUrl = 'https://chroniclingamerica.loc.gov/';
+const archiveBaseUrl = 'https://chroniclingamerica.loc.gov';
 
-export { headerLinks, archiveBaseUrl };
+const getIssueUrl = (lccn, issued, edition) => `${archiveBaseUrl}/lccn/${lccn}/${issued}/${edition}.json`
+
+export { headerLinks, archiveBaseUrl, getIssueUrl };

@@ -1,12 +1,9 @@
 import axios from 'axios';
-import { Card, StyledBody } from 'baseui/card';
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { archiveBaseUrl } from '../../constants';
 import PaginatedTable from '../PaginatedTable';
 import SuperLink from '../SuperLink';
-import { useNavigate } from "react-router-dom";
-import { Button } from 'baseui/button';
 
 const PaperIssuesList = () => {
     const params = useParams();
@@ -23,10 +20,9 @@ const PaperIssuesList = () => {
             .split('/').slice(-1)[0] // ed-1.json
             .split('.')[0]; // ed-1
 
-        console.log(issuedDate, edition)
         return [
             <SuperLink
-                to={`issue/${issuedDate}/edition/${edition}`}>
+                to={`issue/${issuedDate}/${edition}`}>
                 {edition}
             </SuperLink>,
             issuedDate
@@ -41,23 +37,7 @@ const PaperIssuesList = () => {
                 }
                 const mapped = (response.data.issues.map(i => postprocessIssue(i)));
                 setTableData(mapped)
-
-                // return response?.data.issues.length > 0 ?
-                //     axios.get(response.data.issues[0].url) :
-                //     Promise.resolve();
             })
-        // .then((response) => {
-        //     return response?.data.pages.length > 0 ?
-        //         axios.get(response.data.pages[0].url) :
-        //         Promise.resolve();
-        // }).then((response) => {
-        //     if (!response?.data) {
-        //         return;
-        //     }
-        //     console.log('pages ', response.data)
-        //     setImageUrl(response.data.pdf)
-        //     console.log(imageUrl)
-        // })
     }, []);
 
     const columns = ['edition', 'issued'];

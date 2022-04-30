@@ -26,7 +26,7 @@ root.render(
                             <Route index element={<About />}></Route>
                             <Route path='/catalog' element={<Catalog />} ></Route>
                             <Route path='/lccn/:lccn' element={<PaperIssuesList />} ></Route>
-                            <Route path='/lccn/:lccn/issue/:date/edition/:edition' element={<IssueView />} ></Route>
+                            <Route path='/lccn/:lccn/issue/:date/:edition' element={<IssueView />} ></Route>
                             <Route path='/register' element={<Register />} ></Route>
                             <Route path="*" element={<NoMatch />} />
                         </Route>

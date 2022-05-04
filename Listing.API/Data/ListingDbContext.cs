@@ -6,7 +6,6 @@ namespace ListingAPI.Data
     public class ListingDbContext : DbContext
     {
         internal DbSet<Newspaper> Newspapers { get; set; }
-        internal DbSet<Listing> Listings { get; set; }
 
         public ListingDbContext(DbContextOptions<ListingDbContext> options)
             : base(options)
@@ -29,6 +28,9 @@ namespace ListingAPI.Data
             modelBuilder.Entity<Newspaper>().Metadata
                         .FindNavigation(nameof(Newspaper.Listings))?
                         .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+            modelBuilder.Entity<Listing>()
+                        .ToTable("Listings");
         }
     }
 }

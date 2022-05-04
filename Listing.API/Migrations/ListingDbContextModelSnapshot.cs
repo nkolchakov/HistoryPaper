@@ -51,7 +51,7 @@ namespace ListingAPI.Migrations
 
                     b.HasIndex("SerialNumber", "Issued", "Edition");
 
-                    b.ToTable("Listings");
+                    b.ToTable("Listings", (string)null);
                 });
 
             modelBuilder.Entity("ListingAPI.Models.Newspaper", b =>
@@ -67,7 +67,7 @@ namespace ListingAPI.Migrations
 
                     b.HasKey("SerialNumber", "Issued", "Edition");
 
-                    b.ToTable("Newspapers");
+                    b.ToTable("Newspapers", (string)null);
                 });
 
             modelBuilder.Entity("ListingAPI.Models.Listing", b =>

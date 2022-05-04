@@ -59,20 +59,6 @@ namespace ListingAPI.Models
             return new NewspaperCompositeKey(SerialNumber, Issued, Edition);
         }
 
-        //internal static CompareCompositeKeys(NewspaperCompositeKey paperKey)
-        //{
-        //    return this.SerialNumber == paperKey.SerialNumber &&
-        //        this.Issued == paperKey.Issued &&
-        //        this.Edition == paperKey.Edition;
-        //}
-
-        internal static Func<Newspaper, bool> CompositeKeysPredicate(NewspaperCompositeKey nId)
-        {
-            return n => n.SerialNumber == nId.SerialNumber &&
-                        n.Issued == nId.Issued &&
-                        n.Edition == nId.Edition;
-        }
-
         internal void AddListing(NewspaperCompositeKey paperKey, double price, string creatorId, DbContext dbContext)
         {
             if (dbContext == null)

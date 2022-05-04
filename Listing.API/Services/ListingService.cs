@@ -11,7 +11,6 @@ namespace ListingAPI.Services
         public ListingService(ListingDbContext context)
         {
             _dbContext = context ?? throw new ArgumentNullException(nameof(context));
-
         }
 
         public void AddListing(NewspaperCompositeKey paperId, double price, string creatorId)
@@ -48,9 +47,26 @@ namespace ListingAPI.Services
             });
         }
 
-        public void RemoveListing(Listing listing)
+        public int DeleteListing(NewspaperCompositeKey paperId, int listingId)
         {
-            throw new NotImplementedException();
+            var newspaper = _dbContext.Newspapers
+                .Include(n => n.Listings.Where(l => l.Id == listingId))
+                .FirstOrDefault<Newspaper>(n =>
+                                    n.SerialNumber == paperId.SerialNumber &&
+                                    n.Issued == paperId.Issued &&
+                                    n.Edition == paperId.Edition);
+            if (newspaper != null)
+            {
+                var listing = newspaper.Listings.FirstOrDefault();
+                if (listing != null)
+                {
+                    newspaper.RemoveListing(listing);
+                    _dbContext.SaveChanges();
+                    return listingId;
+                }
+            }
+
+            return -1;
         }
     }
 }

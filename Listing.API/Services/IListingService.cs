@@ -15,6 +15,6 @@ namespace ListingAPI.Services
         /// <param name="creatorId"></param>
         void AddListing(NewspaperCompositeKey paperId, double price, string creatorId);
 
-        void RemoveListing(Listing listing);
+        int DeleteListing(NewspaperCompositeKey paperId, int listingId);
     }
 }

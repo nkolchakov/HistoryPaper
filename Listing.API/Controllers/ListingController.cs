@@ -35,5 +35,42 @@ namespace ListingAPI.Controllers
             _listingService.AddListing(parameters.PaperId, parameters.Price, parameters.CreatorId);
             return Ok();
         }
+
+        [HttpDelete("{serialNumber}/{issued}/{edition}/{listingId}")]
+        public IActionResult DeleteListing(string serialNumber, Nullable<DateTime> issued, int edition, int listingId)
+        {
+            IActionResult result;
+            if (string.IsNullOrWhiteSpace(serialNumber))
+            {
+                result = BadRequest(nameof(serialNumber));
+            }
+            else if (!issued.HasValue)
+            {
+                result = BadRequest(issued);
+            }
+            else if (edition < 1)
+            {
+                result = BadRequest("invalid paper edition");
+            }
+            else if (listingId < 1)
+            {
+                result = BadRequest("invalid listing id");
+            }
+            else
+            {
+                var paperCompositeId = new NewspaperCompositeKey(serialNumber, issued.Value, edition);
+                try
+                {
+                    int id = _listingService.DeleteListing(paperCompositeId, listingId);
+                    result = Ok(id);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+
+            return result;
+        }
     }
 }

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { DisplayMedium, DisplaySmall, DisplayXSmall, HeadingSmall } from 'baseui/typography';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { archiveBaseUrl } from '../../constants';
@@ -18,12 +19,13 @@ const PaperIssuesList = () => {
         const issuedDate = issue.date_issued;
         const edition = issue.url
             .split('/').slice(-1)[0] // ed-1.json
-            .split('.')[0]; // ed-1
+            .split('.')[0] // ed-1
+            .split('-')[1] // 1
 
         return [
             <SuperLink
                 to={`issue/${issuedDate}/${edition}`}>
-                {edition}
+                edition #{edition}
             </SuperLink>,
             issuedDate
         ]
@@ -42,9 +44,11 @@ const PaperIssuesList = () => {
 
     const columns = ['edition', 'issued'];
 
-    return (tableData ?
+    return (tableData?.length > 0 ?
         <PaginatedTable columns={columns} data={tableData} />
-        : null)
+        : <HeadingSmall>
+            No available issues for this paper
+        </HeadingSmall>)
 }
 
 export default PaperIssuesList;

@@ -7,8 +7,10 @@ const headerLinks = [
     },
 ]
 
-const archiveBaseUrl = 'https://chroniclingamerica.loc.gov';
+const archiveBaseUrl = process.env.REACT_APP_ARCHIVE_BASE_URL;
+const listingApiBaseUrl = process.env.REACT_APP_LISTING_API_BASE_URL;
 
-const getIssueUrl = (lccn, issued, edition) => `${archiveBaseUrl}/lccn/${lccn}/${issued}/${edition}.json`
+// contains pdf pages + more links
+const getIssueUrl = (lccn, issued, edition) => `${archiveBaseUrl}/lccn/${lccn}/${issued}/ed-${edition}.json`
 
-export { headerLinks, archiveBaseUrl, getIssueUrl };
+export { headerLinks, archiveBaseUrl, listingApiBaseUrl, getIssueUrl };

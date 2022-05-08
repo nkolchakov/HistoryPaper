@@ -6,7 +6,7 @@ import { FormControl } from 'baseui/form-control';
 import { Input } from 'baseui/input';
 import { Select, SIZE } from "baseui/select";
 import React, { useEffect, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { archiveBaseUrl } from "../../constants";
 import states from "../../data/states";
 import { Centered } from "../../styles";
@@ -74,7 +74,7 @@ const Catalog = () => {
                     console.log('setting data ', result.data.items);
                     const parsedRows = buildRows(result.data.items);
                     setCatalogRows(parsedRows)
-                    setCatalogColumns(buildColumns(parsedRows))
+                    setCatalogColumns(buildColumns())
 
                     console.log('setting cols, rows ', catalogRows, catalogColumns)
                 }

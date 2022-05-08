@@ -1,19 +1,14 @@
 import axios from 'axios';
+import { Spinner } from 'baseui/spinner';
+import {
+    HeadingXSmall, LabelLarge, LabelXSmall, ParagraphLarge,
+    ParagraphMedium
+} from 'baseui/typography';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useStyletron } from 'styletron-react';
-import { getIssueUrl } from '../../constants';
-import { Spinner } from 'baseui/spinner';
-import {
-    ParagraphLarge,
-    ParagraphMedium,
-    ParagraphSmall,
-    ParagraphXSmall,
-    LabelLarge,
-    LabelMedium,
-    LabelSmall,
-    LabelXSmall,
-} from 'baseui/typography';
+import { getIssueUrl, listingApiBaseUrl } from '../../constants';
+import ListingsAccordion from '../listing/ListingAccordion';
 const IssueView = () => {
 
     const { lccn, date, edition } = useParams();
@@ -22,22 +17,42 @@ const IssueView = () => {
     const [error, setError] = useState('')
     const [data, setData] = useState()
     const [page, setPage] = useState(null)
+    const [listingsData, setListingsData] = useState([])
+    const [listingsAccOpen, setListingsModalOpen] = useState(false)
 
     useEffect(() => {
+        // initially load the details about this paper + number of listings, bookmarks
         const issueUrl = getIssueUrl(lccn, date, edition)
-        axios.get(issueUrl)
-            .then((pagesResponse) => {
-                if (!pagesResponse?.data)
-                    return;
+        const issuePagesPromise = axios.get(issueUrl);
+        const listingsPromise = axios.get(`${listingApiBaseUrl}/${lccn}/${date}/${edition}`)
 
-                console.log(pagesResponse.data)
-                setData(pagesResponse.data);
-                if (pagesResponse.data.pages.length > 0) {
-                    return axios.get(pagesResponse.data.pages[0].url)
+        Promise.allSettled([issuePagesPromise, listingsPromise])
+            .then(([pagesResponse, listingsResponse]) => {
+                if (listingsResponse.status === 'rejected') {
+                    // console.error('error on listing')
+
+                }
+                if (pagesResponse.status === 'rejected') {
+                    // console.error('error on status')
+                }
+                const listingsValue = listingsResponse.value?.data;
+
+                if (listingsValue) {
+                    setListingsData(listingsValue)
+                    console.log('listing data ', listingsValue)
+                }
+
+                const pagesValue = pagesResponse.value?.data;
+                console.log(pagesValue)
+                setData(pagesValue);
+                if (pagesValue?.pages.length > 0) {
+                    return axios.get(pagesValue.pages[0].url)
                 } else {
                     return Promise.resolve(null);
                 }
-            }, (err) => setError("Can't visualize this edition !"))
+            }, (err) => {
+                // setError("Can't visualize this edition !")
+            })
             .then((pageLinkData) => {
                 if (pageLinkData?.data?.pdf) {
                     setPage(pageLinkData.data.pdf);
@@ -49,6 +64,11 @@ const IssueView = () => {
         <h3>
             {error ?? error}
         </h3>
+        <ListingsAccordion
+            title={(listingsData.length || 'No') + ' listings for this paper'}
+            listings={listingsData}>
+
+        </ListingsAccordion>
         {data ?
             <div className={css({
                 display: 'flex',
@@ -80,8 +100,11 @@ const IssueView = () => {
                         </a>
                     </ParagraphMedium>
                 </span>
-            </div>
-            : null}
+            </div> :
+            <HeadingXSmall>
+                This issue has no available digitized pages; Not digitized, published.
+            </HeadingXSmall>
+        }
     </div >
 
 }

@@ -17,6 +17,17 @@ namespace ListingAPI.Controllers
             this._listingService = listingService ?? throw new ArgumentNullException(nameof(listingService));
         }
 
+        [HttpGet("{id}")]
+        public IActionResult GetListingById(int id)
+        {
+            if (id < 1)
+            {
+                return BadRequest(nameof(id));
+            }
+            var listingDto = _listingService.GetListingById(id);
+            return Ok(listingDto);
+        }
+
         [HttpGet("{serialNumber}/{issued}/{edition}")]
         public IActionResult GetListingsForSn(string serialNumber, DateTime issued, int edition)
         {

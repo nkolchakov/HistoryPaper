@@ -16,5 +16,7 @@ namespace ListingAPI.Services
         void AddListing(NewspaperCompositeKey paperId, double price, string creatorId);
 
         int DeleteListing(NewspaperCompositeKey paperId, int listingId);
+
+        ListingDTO? GetListingById(int id);
     }
 }

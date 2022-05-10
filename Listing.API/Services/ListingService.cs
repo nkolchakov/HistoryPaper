@@ -26,6 +26,18 @@ namespace ListingAPI.Services
             _dbContext.SaveChanges();
         }
 
+        public ListingDTO? GetListingById(int id)
+        {
+            Listing? listing = _dbContext.Listings.Find(id);
+            ListingDTO? listingDto = null;
+            if (listing != null)
+            {
+                listingDto = ListingDTO.FromModel(listing);
+
+            }
+            return listingDto;
+        }
+
         public IEnumerable<ListingDTO> GetListingsForPaper(NewspaperCompositeKey newspaperId)
         {
             Newspaper newspaper = _dbContext.Newspapers
@@ -39,12 +51,7 @@ namespace ListingAPI.Services
                 return Enumerable.Empty<ListingDTO>();
             }
 
-            return newspaper.Listings.Select(l => new ListingDTO()
-            {
-                SerialNumber = l.SerialNumber,
-                Price = l.Price,
-                CreatorId = l.CreatorId
-            });
+            return newspaper.Listings.Select(l => ListingDTO.FromModel(l));
         }
 
         public int DeleteListing(NewspaperCompositeKey paperId, int listingId)

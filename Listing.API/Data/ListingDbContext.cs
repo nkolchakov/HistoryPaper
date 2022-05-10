@@ -6,6 +6,7 @@ namespace ListingAPI.Data
     public class ListingDbContext : DbContext
     {
         internal DbSet<Newspaper> Newspapers { get; set; }
+        internal DbSet<Listing> Listings { get; private set; }
 
         public ListingDbContext(DbContextOptions<ListingDbContext> options)
             : base(options)

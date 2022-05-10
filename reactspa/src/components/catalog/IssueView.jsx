@@ -1,15 +1,18 @@
 import axios from 'axios';
 import { Spinner } from 'baseui/spinner';
+import { Button } from 'baseui/button'
 import {
     HeadingXSmall, LabelLarge, LabelXSmall, ParagraphLarge,
     ParagraphMedium
 } from 'baseui/typography';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useStyletron } from 'styletron-react';
 import { getIssueUrl, listingApiBaseUrl } from '../../constants';
 import ListingsAccordion from '../listing/ListingAccordion';
 const IssueView = () => {
+
+    const navigate = useNavigate();
 
     const { lccn, date, edition } = useParams();
     const [css, theme] = useStyletron();
@@ -64,14 +67,21 @@ const IssueView = () => {
         <h3>
             {error ?? error}
         </h3>
-        <ListingsAccordion
-            title={(listingsData.length || 'No') + ' listings for this paper'}
-            listings={listingsData}>
 
-        </ListingsAccordion>
+        <ListingsAccordion
+            title={(listingsData.length || 'No') + ' available listings for this paper'}
+            listings={listingsData}
+        ></ListingsAccordion>
+
+        <Button size={'compact'}
+            onClick={() => navigate(`/lccn/${lccn}/issue/${date}/${edition}/new`)}
+            className={css({
+                margin: '10px 0 10px 0'
+            })}>Create Listing</Button>
         {data ?
             <div className={css({
                 display: 'flex',
+                marginBottom: '10px',
                 flexDirection: 'row',
                 gap: '15px'
             })}>

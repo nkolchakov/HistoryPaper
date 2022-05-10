@@ -1,16 +1,13 @@
 
-import { StatefulInput } from 'baseui/input';
 import {
-    HeaderNavigation,
-    ALIGN,
-    StyledNavigationItem as NavigationItem,
-    StyledNavigationList as NavigationList,
+    ALIGN, HeaderNavigation, StyledNavigationItem as NavigationItem,
+    StyledNavigationList as NavigationList
 } from 'baseui/header-navigation';
 import { StatefulSelect as Search, TYPE } from 'baseui/select';
-import React, { useState } from 'react';
-import { headerLinks } from './constants';
-import { Link, Outlet } from 'react-router-dom';
+import React from 'react';
+import { Outlet } from 'react-router-dom';
 import SuperLink from './components/SuperLink';
+import { headerLinks } from './constants';
 import { Centered } from './styles';
 
 const options = {
@@ -26,8 +23,6 @@ function App() {
 
     return (
         <div className="App">
-
-
             <HeaderNavigation overrides={{
                 Root: {
                     style: {

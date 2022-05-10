@@ -5,6 +5,7 @@ import { StatefulDatepicker } from 'baseui/datepicker';
 import { FormControl } from 'baseui/form-control';
 import { Input } from 'baseui/input';
 import { Select, SIZE } from "baseui/select";
+import { Spinner } from "baseui/spinner";
 import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { archiveBaseUrl } from "../../constants";
@@ -13,13 +14,15 @@ import { Centered } from "../../styles";
 import SuperLink from "../SuperLink";
 
 const Catalog = () => {
-    const [terms, setTerms] = useState('')
     const [state, setState] = useState('');
+    const [terms, setTerms] = useState('')
     const [dateRange, setDateRange] = useState([new Date(1890, 0)]);
     const [rowsCount, setRowsCount] = useState(15);
+
     const [catalogRows, setCatalogRows] = useState([]);
     const [catalogColumns, setCatalogColumns] = useState([])
     const [statesOptions, setStateOptions] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
 
     const buildQuery = () => {
         let queryUrl = `${archiveBaseUrl}/search/titles/results/`;
@@ -65,7 +68,7 @@ const Catalog = () => {
 
     const onFilter = (event) => {
         event.preventDefault();
-
+        setIsLoading(true)
         buildQuery()
             .then((result) => {
                 // TODO: post-process data, 9999 year to current
@@ -78,6 +81,7 @@ const Catalog = () => {
 
                     console.log('setting cols, rows ', catalogRows, catalogColumns)
                 }
+                setIsLoading(false)
             })
     }
 
@@ -159,14 +163,21 @@ const Catalog = () => {
                     </Button>
                 </form>
             </Centered>
-            {catalogRows.length > 0 ? <div style={{ height: '600px' }}>
-                <StatefulDataTable columns={catalogColumns} rows={catalogRows} />
-            </div> : null}
+            {!isLoading ?
+                (catalogRows.length > 0 ? <div style={{ height: '600px' }}>
+                    <StatefulDataTable columns={catalogColumns} rows={catalogRows} />
+                </div> : null) :
+                <Centered>
+                    <Spinner />
+                </Centered>
+            }
+
+
             <Outlet></Outlet>
 
 
 
-        </div>
+        </div >
     )
 
 }

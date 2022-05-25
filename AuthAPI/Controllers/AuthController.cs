@@ -3,6 +3,8 @@ using AuthAPI.DTO;
 using AuthAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace AuthAPI.Controllers
 {
@@ -37,7 +39,7 @@ namespace AuthAPI.Controllers
         }
 
         [HttpPost("signin")]
-        public IActionResult Login([FromBody] LoginUserDto loginData)
+        public async Task<IActionResult> Login([FromBody] LoginUserDto loginData)
         {
             if (loginData?.Username == null || loginData?.Password == null)
             {
@@ -45,18 +47,41 @@ namespace AuthAPI.Controllers
             }
             try
             {
-                UserDto? loggedInUser = this.authService.Login(loginData);
-                if (loggedInUser != null)
+                Token? token = await this.authService.Login(loginData);
+                if (token == null)
                 {
-                    return Ok(loggedInUser);
+                    return Unauthorized();
                 }
-
-                return BadRequest("invalid password or username");
+                return Ok(token);
             }
             catch (Exception)
             {
                 return BadRequest("something went wrong");
             }
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] Token token)
+        {
+            if (token == null)
+            {
+                return BadRequest(nameof(token));
+            }
+
+            try
+            {
+                Token tokenPair = await authService.GetTokenPair(token);
+                return Ok(tokenPair);
+            }
+            catch (SecurityTokenException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return BadRequest("something went wrong");
+            }
+
         }
     }
 }

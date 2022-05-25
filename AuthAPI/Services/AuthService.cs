@@ -1,47 +1,50 @@
 ﻿using AuthAPI.Data;
-using System.Security.Cryptography;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using AuthAPI.Models;
 using AuthAPI.DTO;
 using AuthAPI.CustomExceptions;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AuthAPI.Services
 {
     public class AuthService : IAuthService
     {
-        private const int bytesCount = 16;
         private readonly UserDbContext dbContext;
+        private readonly IUtilsAuth authUtils;
+        private readonly IConfiguration configuration;
 
-        public AuthService(UserDbContext dbContext)
+        public AuthService(UserDbContext dbContext, IUtilsAuth authUtils, IConfiguration configuration)
         {
             this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        }
-        public byte[] GenerateSalt()
-        {
-            var salt = RandomNumberGenerator.GetBytes(bytesCount);
-            return salt;
+            this.authUtils = authUtils ?? throw new ArgumentNullException(nameof(authUtils));
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public string HashPassword(string password, byte[] salt)
-        {
-            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                        password: password,
-                        salt: salt,
-                        prf: KeyDerivationPrf.HMACSHA256,
-                        iterationCount: 100000,
-                        numBytesRequested: 256 / 8));
-            return hashed;
-        }
 
-        public UserDto? Login(LoginUserDto loginData)
+        public async Task<Token?> Login(LoginUserDto loginData)
         {
             var user = dbContext.Users.Where(u => u.Username == loginData.Username).FirstOrDefault();
             if (user != null)
             {
-                bool passwordMatch = HashPassword(loginData.Password, user.Salt) == user.Password;
+                bool passwordMatch = this.authUtils.HashPassword(loginData.Password, user.Salt) == user.Password;
                 if (passwordMatch)
                 {
-                    return UserDto.FromModel(user);
+                    var userDto = UserDto.FromModel(user);
+                    string token = this.authUtils.GenerateToken(userDto);
+
+                    string refreshToken = this.authUtils.GenerateRefreshToken();
+                    _ = int.TryParse(this.configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays);
+
+                    user.RefreshToken = refreshToken;
+                    user.RefreshTokenExpiryTime = DateTime.Now.AddDays(refreshTokenValidityInDays);
+
+                    dbContext.Users.Update(user);
+                    await dbContext.SaveChangesAsync();
+
+                    return new Token()
+                    {
+                        AccessToken = token,
+                        RefreshToken = refreshToken
+                    };
                 }
             }
             return null;
@@ -59,10 +62,10 @@ namespace AuthAPI.Services
             }
 
             // create salt
-            var salt = GenerateSalt();
+            var salt = this.authUtils.GenerateSalt();
 
             // hash password + salt
-            var hashedPassword = HashPassword(registerUserDto.Password, salt);
+            var hashedPassword = this.authUtils.HashPassword(registerUserDto.Password, salt);
 
             var user = new User()
             {
@@ -81,6 +84,38 @@ namespace AuthAPI.Services
                 Name = user.Name,
                 Username = user.Username
             };
+        }
+
+        public async Task<Token> GetTokenPair(Token token)
+        {
+            if (token == null)
+            {
+                // throw invalid token
+            }
+            // get the user from the access token
+            var principal = this.authUtils.GetPrincipal(token.AccessToken);
+
+            var user = dbContext.Users.FirstOrDefault(u => u.Username == principal.Identity.Name);
+
+            // validate if the users refresh token is valid
+            if (user == null ||
+                (user.RefreshToken != token.RefreshToken) ||
+                (user.RefreshTokenExpiryTime <= DateTime.Now))
+            {
+                // invalid token error
+                throw new SecurityTokenException("invalid token");
+            }
+
+
+            string newAccessToken = authUtils.GenerateToken(UserDto.FromModel(user));
+            string newRefresh = authUtils.GenerateRefreshToken();
+
+            user.RefreshToken = newRefresh;
+            dbContext.Users.Update(user);
+            await dbContext.SaveChangesAsync();
+
+            // generate new pair and return it
+            return new Token() { AccessToken = newAccessToken, RefreshToken = newRefresh };
         }
     }
 }

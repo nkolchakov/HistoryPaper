@@ -4,8 +4,8 @@ namespace AuthAPI.Services
 {
     public interface IAuthService
     {
-        byte[] GenerateSalt();
         Task<UserDto> RegisterUser(RegisterUserDto registerData);
-        UserDto? Login(LoginUserDto loginData);
+        Task<Token?> Login(LoginUserDto loginData);
+        Task<Token> GetTokenPair(Token token);
     }
 }

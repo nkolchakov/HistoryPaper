@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Catalog from './components/catalog/Catalog';
-import Register from './components/Register';
+import Register from './components/auth/Register';
 import About from './components/About';
 import NoMatch from './components/NoMatch';
 import { Client as Styletron } from 'styletron-engine-atomic';
@@ -15,6 +15,8 @@ import IssueView from './components/catalog/IssueView';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import ListingView from './components/listing/ListingView';
 import CreateListing from './components/listing/CreateListing';
+import Login from './components/auth/Login';
+import { AuthProvider } from './context/AuthContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const engine = new Styletron();
@@ -31,18 +33,21 @@ root.render(
             <StyletronProvider value={engine}>
                 <BaseProvider theme={LightTheme}>
                     <BrowserRouter>
-                        <Routes>
-                            <Route path="/" element={<App />}>
-                                <Route index element={<About />}></Route>
-                                <Route path='/catalog' element={<Catalog />} ></Route>
-                                <Route path='/lccn/:lccn' element={<PaperIssuesList />} ></Route>
-                                <Route path='/lccn/:lccn/issue/:date/:edition' element={<IssueView />} ></Route>
-                                <Route path='/lccn/:lccn/issue/:date/:edition/new' element={<CreateListing />} ></Route>
-                                <Route path='/register' element={<Register />} ></Route>
-                                <Route path='/listing/:id' element={<ListingView />} ></Route>
-                                <Route path="*" element={<NoMatch />} />
-                            </Route>
-                        </Routes>
+                        <AuthProvider>
+                            <Routes>
+                                <Route path="/" element={<App />}>
+                                    <Route index element={<About />}></Route>
+                                    <Route path='/catalog' element={<Catalog />} ></Route>
+                                    <Route path='/lccn/:lccn' element={<PaperIssuesList />} ></Route>
+                                    <Route path='/lccn/:lccn/issue/:date/:edition' element={<IssueView />} ></Route>
+                                    <Route path='/lccn/:lccn/issue/:date/:edition/new' element={<CreateListing />} ></Route>
+                                    <Route path='/signin' element={<Login />} ></Route>
+                                    <Route path='/signup' element={<Register />} ></Route>
+                                    <Route path='/listing/:id' element={<ListingView />} ></Route>
+                                    <Route path="*" element={<NoMatch />} />
+                                </Route>
+                            </Routes>
+                        </AuthProvider>
                     </BrowserRouter>
                 </BaseProvider>
             </StyletronProvider>

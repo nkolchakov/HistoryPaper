@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { Button } from 'baseui/button';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useStyletron } from 'styletron-react';
 import { listingApiBaseUrl } from '../../constants';
+import AuthContext from '../../context/AuthContext';
 import NewspaperView from '../issue/NewspaperView';
 import ListingsAccordion from '../listing/ListingAccordion';
 const IssueView = () => {
@@ -15,6 +16,17 @@ const IssueView = () => {
     const [error, setError] = useState('')
     const [dataAvaiable, setDataAvailable] = useState(false)
     const [listingsData, setListingsData] = useState([])
+
+    const { user } = useContext(AuthContext)
+
+    const createListingClick = () => {
+        if (user) {
+            navigate(`/lccn/${lccn}/issue/${date}/${edition}/new`)
+
+        } else {
+            navigate(`/signin`)
+        }
+    }
 
     useEffect(() => {
         axios.get(`${listingApiBaseUrl}/${lccn}/${date}/${edition}`)
@@ -41,7 +53,7 @@ const IssueView = () => {
             ></ListingsAccordion>
 
             <Button size={'compact'}
-                onClick={() => navigate(`/lccn/${lccn}/issue/${date}/${edition}/new`)}
+                onClick={createListingClick}
                 className={css({
                     margin: '10px 0 10px 0'
                 })}>

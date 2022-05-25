@@ -1,13 +1,14 @@
 
+import { Button } from 'baseui/button';
 import {
     ALIGN, HeaderNavigation, StyledNavigationItem as NavigationItem,
     StyledNavigationList as NavigationList
 } from 'baseui/header-navigation';
 import { StatefulSelect as Search, TYPE } from 'baseui/select';
-import React from 'react';
+import React, { useContext } from 'react';
 import { Outlet } from 'react-router-dom';
 import SuperLink from './components/SuperLink';
-import { headerLinks } from './constants';
+import AuthContext from './context/AuthContext';
 import { Centered } from './styles';
 
 const options = {
@@ -21,6 +22,8 @@ const options = {
 
 function App() {
 
+    let { user, logoutUser } = useContext(AuthContext);
+
     return (
         <div className="App">
             <HeaderNavigation overrides={{
@@ -32,15 +35,35 @@ function App() {
             }} >
                 <NavigationList $align={ALIGN.left}>
                     <NavigationItem>historypaper</NavigationItem>
-
-                    {headerLinks.map((l, i) => (<NavigationItem key={i}>
-                        <SuperLink to={l.link}>{l.label}</SuperLink>
-                    </NavigationItem>))}
+                    <NavigationItem >
+                        <SuperLink to='/catalog'>Catalog</SuperLink>
+                    </NavigationItem>
+                    {
+                        user ? null :
+                            <>
+                                <NavigationItem>
+                                    <SuperLink to='/signin'>Login</SuperLink>
+                                </NavigationItem>
+                                <NavigationItem >
+                                    <SuperLink to='/signup'>Register</SuperLink>
+                                </NavigationItem>
+                            </>
+                    }
                 </NavigationList>
                 <NavigationList $align={ALIGN.center} />
                 <NavigationList $align={ALIGN.right}>
                 </NavigationList>
                 <NavigationList $align={ALIGN.right}>
+                    {
+                        user ? <>
+                            <NavigationItem>
+                                Hello, {user.unique_name}
+                            </NavigationItem>
+                            <NavigationItem>
+                                <Button onClick={logoutUser} size='compact'>Logout</Button>
+                            </NavigationItem>
+                        </> : null
+                    }
                     <NavigationItem style={{ width: '200px' }}>
                         <Search
                             {...options}

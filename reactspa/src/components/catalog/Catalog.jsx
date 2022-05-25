@@ -8,8 +8,9 @@ import { Select, SIZE } from "baseui/select";
 import { Spinner } from "baseui/spinner";
 import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { archiveBaseUrl } from "../../constants";
+import { archiveBaseUrl, listingApiBaseUrl } from "../../constants";
 import states from "../../data/states";
+import useAxios from "../../hooks/useAxios";
 import { Centered } from "../../styles";
 import SuperLink from "../SuperLink";
 
@@ -23,6 +24,8 @@ const Catalog = () => {
     const [catalogColumns, setCatalogColumns] = useState([])
     const [statesOptions, setStateOptions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
+
+    const axiosInstance = useAxios();
 
     const buildQuery = () => {
         let queryUrl = `${archiveBaseUrl}/search/titles/results/`;
@@ -175,6 +178,26 @@ const Catalog = () => {
 
             <Outlet></Outlet>
 
+            <div>
+
+                <Button onClick={() => {
+                    axiosInstance.get(`${listingApiBaseUrl}/test1`)
+                        .then((response) => {
+                            console.log(response.data)
+                        }).catch((err) => {
+
+                        })
+                }}>Non-auth</Button>
+
+
+                <Button onClick={() => {
+                    axiosInstance.get(`${listingApiBaseUrl}/test2`)
+                        .then((response) => {
+                            console.log(response.data)
+                        })
+                }}>Auth</Button>
+
+            </div>
 
 
         </div >
